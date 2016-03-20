@@ -54,8 +54,8 @@ namespace Graphics3D
             var point = Vector3.TransformCoordinate(coord, transformationMatrix);
 
             // Fit from center to left-top corner.
-            var x =  point.X * bmp.PixelWidth + bmp.PixelWidth / 2.0f;
-            var y = -point.Y * bmp.PixelHeight + bmp.PixelHeight / 2.0f;
+            var x = point.X * bmp.PixelWidth + bmp.PixelWidth / 2.0f;
+            var y = point.Y * bmp.PixelHeight + bmp.PixelHeight / 2.0f;
 
             return new Vector(x, y);
         }
@@ -109,11 +109,10 @@ namespace Graphics3D
         {
             var viewMatrix = SharpDX.Matrix.LookAtLH(camera.Position, camera.Target, Vector3.UnitY);
 
-            var projectionMatrix = SharpDX.Matrix
-                .PerspectiveFovRH(
-                    0.78f,
-                    (float)bmp.PixelWidth / bmp.PixelHeight,
-                    0.01f, 1.0f);
+            float FoV = 0.78f;
+            float aspectRatio = (float)bmp.PixelWidth / bmp.PixelHeight;
+            float nearPlane = 0.01f, farPlane = 1.0f;
+            var projectionMatrix = SharpDX.Matrix.PerspectiveFovRH(FoV, aspectRatio, nearPlane, farPlane);
 
             foreach (Mesh mesh in meshes)
             {

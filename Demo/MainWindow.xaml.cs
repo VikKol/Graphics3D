@@ -1,6 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Input;
 using SharpDX;
 using Graphics3D;
 
@@ -12,7 +13,7 @@ namespace Demo
     public partial class MainWindow : Window
     {
         private Device device;
-        private Mesh mesh = new Mesh("Cube", 8, 12);
+        private Mesh[] meshes;
         private Graphics3D.Camera camera = new Graphics3D.Camera();
 
         public MainWindow()
@@ -26,32 +27,13 @@ namespace Demo
                 (int)ImgContainer.ActualWidth, (int)ImgContainer.ActualHeight, 
                 96.0, 96.0, PixelFormats.Pbgra32, null);
 
-            device = new Device(bmp);
             Img.Source = bmp;
 
-            mesh.Vertices[0] = new Vector3(-1, 1, 1);
-            mesh.Vertices[1] = new Vector3(1, 1, 1);
-            mesh.Vertices[2] = new Vector3(-1, -1, 1);
-            mesh.Vertices[3] = new Vector3(1, -1, 1);
-            mesh.Vertices[4] = new Vector3(-1, 1, -1);
-            mesh.Vertices[5] = new Vector3(1, 1, -1);
-            mesh.Vertices[6] = new Vector3(1, -1, -1);
-            mesh.Vertices[7] = new Vector3(-1, -1, -1);
+            device = new Device(bmp);
 
-            mesh.Faces[0] = new Face { A = 0, B = 1, C = 2 };
-            mesh.Faces[1] = new Face { A = 1, B = 2, C = 3 };
-            mesh.Faces[2] = new Face { A = 1, B = 3, C = 6 };
-            mesh.Faces[3] = new Face { A = 1, B = 5, C = 6 };
-            mesh.Faces[4] = new Face { A = 0, B = 1, C = 4 };
-            mesh.Faces[5] = new Face { A = 1, B = 4, C = 5 };
-            mesh.Faces[6] = new Face { A = 2, B = 3, C = 7 };
-            mesh.Faces[7] = new Face { A = 3, B = 6, C = 7 };
-            mesh.Faces[8] = new Face { A = 0, B = 2, C = 7 };
-            mesh.Faces[9] = new Face { A = 0, B = 4, C = 7 };
-            mesh.Faces[10] = new Face { A = 4, B = 5, C = 6 };
-            mesh.Faces[11] = new Face { A = 4, B = 6, C = 7 };
+            meshes = MeshHelper.LoadFromJsonFile("Meshes/monkey.babylon");
 
-            camera.Position = new Vector3(0, 0, 15.0f);
+            camera.Position = new Vector3(0, 0, (float)DepthPos.Value);
             camera.Target = new Vector3(0, 0, 0);
 
             CompositionTarget.Rendering += CompositionTarget_Rendering;
@@ -61,10 +43,88 @@ namespace Demo
         {
             device.Clear(0, 0, 0, 255);
 
-            mesh.Rotation = new Vector3(mesh.Rotation.X + 0.05f, mesh.Rotation.Y + 0.05f, mesh.Rotation.Z);
+            foreach(var mesh in meshes)
+            {
+                mesh.Rotation = new Vector3(mesh.Rotation.X, mesh.Rotation.Y + 0.05f, mesh.Rotation.Z);
+            }
 
-            device.Render(camera, mesh);
+            device.Render(camera, meshes);
             device.Present();
+        }
+
+        private void up_Click(object sender, RoutedEventArgs e)
+        {
+            camera.Target = new Vector3(
+                camera.Target.X,
+                camera.Target.Y + 0.1f,
+                camera.Target.Z);
+        }
+
+        private void left_Click(object sender, RoutedEventArgs e)
+        {
+            camera.Target = new Vector3(
+                camera.Target.X - 0.1f,
+                camera.Target.Y,
+                camera.Target.Z);
+        }
+
+        private void right_Click(object sender, RoutedEventArgs e)
+        {
+            camera.Target = new Vector3(
+                camera.Target.X + 0.1f,
+                camera.Target.Y,
+                camera.Target.Z);
+        }
+
+        private void down_Click(object sender, RoutedEventArgs e)
+        {
+            camera.Target = new Vector3(
+                camera.Target.X,
+                camera.Target.Y - 0.1f,
+                camera.Target.Z);
+        }
+
+        private void Window_KeyDown(object sender, KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case Key.Up:
+                    up_Click(null, null);
+                    break;
+                case Key.Left:
+                    left_Click(null, null);
+                    break;
+                case Key.Right:
+                    right_Click(null, null);
+                    break;
+                case Key.Down:
+                    down_Click(null, null);
+                    break;
+            }
+        }
+
+        private void VerticalPos_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            camera.Position = new Vector3(
+                camera.Position.X,
+                camera.Position.Y + (float)(e.NewValue - e.OldValue),
+                camera.Position.Z);
+        }
+
+        private void HorizontalPos_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            camera.Position = new Vector3(
+                camera.Position.X + (float)(e.NewValue - e.OldValue),
+                camera.Position.Y,
+                camera.Position.Z);
+        }
+
+        private void DepthPos_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            camera.Position = new Vector3(
+                camera.Position.X,
+                camera.Position.Y,
+                camera.Position.Z + (float)(e.NewValue - e.OldValue));
         }
     }
 }
