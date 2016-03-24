@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Input;
@@ -12,9 +13,12 @@ namespace Demo
     /// </summary>
     public partial class MainWindow : Window
     {
+        const double DPI = 96.0;
+
         private Device device;
         private Mesh[] meshes;
         private Graphics3D.Camera camera = new Graphics3D.Camera();
+        private static DateTime previousDate = DateTime.Now;
 
         public MainWindow()
         {
@@ -24,8 +28,8 @@ namespace Demo
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             var bmp = new WriteableBitmap(
-                (int)ImgContainer.ActualWidth, (int)ImgContainer.ActualHeight, 
-                96.0, 96.0, PixelFormats.Pbgra32, null);
+                (int)ImgContainer.ActualWidth, (int)ImgContainer.ActualHeight,
+                DPI, DPI, PixelFormats.Pbgra32, null);
 
             Img.Source = bmp;
 
@@ -41,6 +45,13 @@ namespace Demo
 
         void CompositionTarget_Rendering(object sender, object e)
         {
+            // Fps
+            var now = DateTime.Now;
+            var currentFps = 1000.0 / (now - previousDate).TotalMilliseconds;
+            fps.Content = string.Format("{0:0.00} fps", currentFps);
+            previousDate = now;
+
+            // Rendering loop
             device.Clear(0, 0, 0, 255);
 
             foreach(var mesh in meshes)
@@ -52,13 +63,7 @@ namespace Demo
             device.Present();
         }
 
-        private void up_Click(object sender, RoutedEventArgs e)
-        {
-            camera.Target = new Vector3(
-                camera.Target.X,
-                camera.Target.Y + 0.1f,
-                camera.Target.Z);
-        }
+        #region Move camera
 
         private void left_Click(object sender, RoutedEventArgs e)
         {
@@ -73,6 +78,14 @@ namespace Demo
             camera.Target = new Vector3(
                 camera.Target.X + 0.1f,
                 camera.Target.Y,
+                camera.Target.Z);
+        }
+
+        private void up_Click(object sender, RoutedEventArgs e)
+        {
+            camera.Target = new Vector3(
+                camera.Target.X,
+                camera.Target.Y + 0.1f,
                 camera.Target.Z);
         }
 
@@ -102,20 +115,19 @@ namespace Demo
                     break;
             }
         }
-
-        private void VerticalPos_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-            camera.Position = new Vector3(
-                camera.Position.X,
-                camera.Position.Y + (float)(e.NewValue - e.OldValue),
-                camera.Position.Z);
-        }
-
+        
         private void HorizontalPos_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             camera.Position = new Vector3(
                 camera.Position.X + (float)(e.NewValue - e.OldValue),
                 camera.Position.Y,
+                camera.Position.Z);
+        }
+        private void VerticalPos_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            camera.Position = new Vector3(
+                camera.Position.X,
+                camera.Position.Y + (float)(e.NewValue - e.OldValue),
                 camera.Position.Z);
         }
 
@@ -126,5 +138,7 @@ namespace Demo
                 camera.Position.Y,
                 camera.Position.Z + (float)(e.NewValue - e.OldValue));
         }
+
+        #endregion
     }
 }
