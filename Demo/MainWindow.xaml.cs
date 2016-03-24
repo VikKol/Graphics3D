@@ -17,6 +17,7 @@ namespace Demo
 
         private Device device;
         private Mesh[] meshes;
+        private Vector3 light = new Vector3(0, 100, 15);
         private Graphics3D.Camera camera = new Graphics3D.Camera();
         private static DateTime previousDate = DateTime.Now;
 
@@ -32,13 +33,12 @@ namespace Demo
                 DPI, DPI, PixelFormats.Pbgra32, null);
 
             Img.Source = bmp;
-
-            device = new Device(bmp);
-
-            meshes = MeshHelper.LoadFromJsonFile("Meshes/monkey.babylon");
-
             camera.Position = new Vector3(0, 0, (float)DepthPos.Value);
             camera.Target = new Vector3(0, 0, 0);
+            device = new Device(camera, light, bmp);
+
+            meshes = MeshHelper.LoadFromJsonFile("Meshes/monkey.babylon");
+            //meshes = MeshHelper.LoadFromJsonFile("Meshes/car.babylon");
 
             CompositionTarget.Rendering += CompositionTarget_Rendering;
         }
@@ -59,7 +59,7 @@ namespace Demo
                 mesh.Rotation = new Vector3(mesh.Rotation.X, mesh.Rotation.Y + 0.05f, mesh.Rotation.Z);
             }
 
-            device.Render(camera, meshes);
+            device.Render(meshes);
             device.Present();
         }
 
