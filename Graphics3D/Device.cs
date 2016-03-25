@@ -63,12 +63,12 @@ namespace Graphics3D
 
         public void Render(params Mesh[] meshes)
         {
-            float FoV = 0.78f;
+            float FoV = 0.8f;
             float aspectRatio = (float)width / height;
             float nearPlane = 0.01f, farPlane = 1.0f;
 
             var viewMatrix = SharpDX.Matrix.LookAtLH(camera.Position, camera.Target, Vector3.UnitY);
-            var projectionMatrix = SharpDX.Matrix.PerspectiveFovRH(FoV, aspectRatio, nearPlane, farPlane);
+            var projectionMatrix = SharpDX.Matrix.PerspectiveFovLH(FoV, aspectRatio, nearPlane, farPlane);
 
             foreach (Mesh mesh in meshes)
             {
@@ -88,7 +88,7 @@ namespace Graphics3D
                     var pixelB = ProjectTo2D(vertexB, transformMatrix, worldMatrix);
                     var pixelC = ProjectTo2D(vertexC, transformMatrix, worldMatrix);
 
-                    FillTriangle(pixelA, pixelB, pixelC, Color.DarkGray);
+                    FillTriangle(pixelA, pixelB, pixelC, Color.Black);
                 });
             }
         }
@@ -101,7 +101,7 @@ namespace Graphics3D
 
             // Fit from center to left-top corner.
             var x = point2d.X * width + width / 2.0f;
-            var y = point2d.Y * height + height / 2.0f;
+            var y = -point2d.Y * height + height / 2.0f;
 
             vertex.WorldNormal = normal3dWorld;
             vertex.WorldCoordinates = point3dWorld;
@@ -168,9 +168,9 @@ namespace Graphics3D
             Vector3 p3 = v3.Coordinates2D;
 
             var data = new ScanLineData();
-            float NdotLight1 = CalcCosineAlpha(v1.WorldCoordinates, v1.WorldNormal, lightPosition);
-            float NdotLight2 = CalcCosineAlpha(v2.WorldCoordinates, v2.WorldNormal, lightPosition);
-            float NdotLight3 = CalcCosineAlpha(v3.WorldCoordinates, v3.WorldNormal, lightPosition);
+            float NdotLight1 = MathEx.CalcCosineAlpha(v1.WorldCoordinates, v1.WorldNormal, lightPosition);
+            float NdotLight2 = MathEx.CalcCosineAlpha(v2.WorldCoordinates, v2.WorldNormal, lightPosition);
+            float NdotLight3 = MathEx.CalcCosineAlpha(v3.WorldCoordinates, v3.WorldNormal, lightPosition);
 
             float invSlope1 = 0, invSlope2 = 0;
             if (p2.Y - p1.Y > 0)
@@ -191,22 +191,23 @@ namespace Graphics3D
             // P3
             if (invSlope1 > invSlope2)
             {
+                data.NdotLightV11 = NdotLight1;
+                data.NdotLightV12 = NdotLight3;
+                data.NdotLightV21 = NdotLight1;
+                data.NdotLightV22 = NdotLight2;
                 for (int currY = (int)p1.Y; currY < (int)p2.Y; currY++)
                 {
                     data.CurrentY = currY;
-                    data.NdotLightV11 = NdotLight1;
-                    data.NdotLightV12 = NdotLight3;
-                    data.NdotLightV21 = NdotLight1;
-                    data.NdotLightV22 = NdotLight2;
                     ProcessScanLine(data, v1, v3, v1, v2, color);
                 }
+
+                data.NdotLightV11 = NdotLight1;
+                data.NdotLightV12 = NdotLight3;
+                data.NdotLightV21 = NdotLight2;
+                data.NdotLightV22 = NdotLight3;
                 for (int currY = (int)p2.Y; currY <= (int)p3.Y; currY++)
                 {
                     data.CurrentY = currY;
-                    data.NdotLightV11 = NdotLight1;
-                    data.NdotLightV12 = NdotLight3;
-                    data.NdotLightV21 = NdotLight2;
-                    data.NdotLightV22 = NdotLight3;
                     ProcessScanLine(data, v1, v3, v2, v3, color);
                 }
             }
@@ -223,22 +224,23 @@ namespace Graphics3D
             //       P3
             else
             {
+                data.NdotLightV11 = NdotLight1;
+                data.NdotLightV12 = NdotLight2;
+                data.NdotLightV21 = NdotLight1;
+                data.NdotLightV22 = NdotLight3;
                 for (int currY = (int)p1.Y; currY <= (int)p2.Y; currY++)
                 {
                     data.CurrentY = currY;
-                    data.NdotLightV11 = NdotLight1;
-                    data.NdotLightV12 = NdotLight2;
-                    data.NdotLightV21 = NdotLight1;
-                    data.NdotLightV22 = NdotLight3;
                     ProcessScanLine(data, v1, v2, v1, v3, color);
                 }
+
+                data.NdotLightV11 = NdotLight2;
+                data.NdotLightV12 = NdotLight3;
+                data.NdotLightV21 = NdotLight1;
+                data.NdotLightV22 = NdotLight3;
                 for (int currY = (int)p2.Y; currY <= (int)p3.Y; currY++)
                 {
                     data.CurrentY = currY;
-                    data.NdotLightV11 = NdotLight2;
-                    data.NdotLightV12 = NdotLight3;
-                    data.NdotLightV21 = NdotLight1;
-                    data.NdotLightV22 = NdotLight3;
                     ProcessScanLine(data, v2, v3, v1, v3, color);
                 }
             }
@@ -258,16 +260,6 @@ namespace Graphics3D
                 int bgra = (int)new Color(color.B, color.G, color.R, color.A);
                 backBuffer.AsIntArray((buffer, length) => Interlocked.Exchange(ref buffer[index], bgra));
             }
-        }
-
-        private static float CalcCosineAlpha(Vector3 vertex, Vector3 normal, Vector3 lightPosition)
-        {
-            var lightDirection = lightPosition - vertex;
-
-            normal.Normalize();
-            lightDirection.Normalize();
-
-            return Math.Max(0, Vector3.Dot(normal, lightDirection));
         }
     }
 }

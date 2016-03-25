@@ -17,7 +17,7 @@ namespace Demo
 
         private Device device;
         private Mesh[] meshes;
-        private Vector3 light = new Vector3(0, 100, 15);
+        private Vector3 light = new Vector3(0, 10, 25);
         private Graphics3D.Camera camera = new Graphics3D.Camera();
         private static DateTime previousDate = DateTime.Now;
 
@@ -33,12 +33,12 @@ namespace Demo
                 DPI, DPI, PixelFormats.Pbgra32, null);
 
             Img.Source = bmp;
-            camera.Position = new Vector3(0, 0, (float)DepthPos.Value);
-            camera.Target = new Vector3(0, 0, 0);
+            camera.Target = Vector3.Zero;
+            camera.Position = new Vector3((float)HorizontalPos.Value, (float)VerticalPos.Value, (float)DepthPos.Value);
             device = new Device(camera, light, bmp);
 
-            meshes = MeshHelper.LoadFromJsonFile("Meshes/monkey.babylon");
-            //meshes = MeshHelper.LoadFromJsonFile("Meshes/car.babylon");
+            //meshes = MeshHelper.LoadFromJsonFile("Meshes/monkey.babylon");
+            meshes = MeshHelper.LoadFromJsonFile("Meshes/car.babylon");
 
             CompositionTarget.Rendering += CompositionTarget_Rendering;
         }
@@ -56,7 +56,7 @@ namespace Demo
 
             foreach(var mesh in meshes)
             {
-                mesh.Rotation = new Vector3(mesh.Rotation.X, mesh.Rotation.Y + 0.05f, mesh.Rotation.Z);
+                mesh.Rotation = new Vector3(mesh.Rotation.X, mesh.Rotation.Y + 0.01f, mesh.Rotation.Z);
             }
 
             device.Render(meshes);
@@ -68,7 +68,7 @@ namespace Demo
         private void left_Click(object sender, RoutedEventArgs e)
         {
             camera.Target = new Vector3(
-                camera.Target.X - 0.1f,
+                camera.Target.X + 0.1f,
                 camera.Target.Y,
                 camera.Target.Z);
         }
@@ -76,7 +76,7 @@ namespace Demo
         private void right_Click(object sender, RoutedEventArgs e)
         {
             camera.Target = new Vector3(
-                camera.Target.X + 0.1f,
+                camera.Target.X - 0.1f,
                 camera.Target.Y,
                 camera.Target.Z);
         }
