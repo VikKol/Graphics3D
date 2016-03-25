@@ -17,8 +17,8 @@ namespace Demo
 
         private Device device;
         private Mesh[] meshes;
-        private Vector3 light = new Vector3(0, 10, 25);
-        private Graphics3D.Camera camera = new Graphics3D.Camera();
+        private readonly Light light = new Light();
+        private readonly Graphics3D.Camera camera = new Graphics3D.Camera();
         private static DateTime previousDate = DateTime.Now;
 
         public MainWindow()
@@ -35,6 +35,7 @@ namespace Demo
             Img.Source = bmp;
             camera.Target = Vector3.Zero;
             camera.Position = new Vector3((float)HorizontalPos.Value, (float)VerticalPos.Value, (float)DepthPos.Value);
+            light.Position = new Vector3((float)LightHorizontalPos.Value, (float)LightVerticalPos.Value, (float)LightDepthPos.Value);
             device = new Device(camera, light, bmp);
 
             //meshes = MeshHelper.LoadFromJsonFile("Meshes/monkey.babylon");
@@ -63,39 +64,31 @@ namespace Demo
             device.Present();
         }
 
-        #region Move camera
+        #region Camera and Light
 
-        private void left_Click(object sender, RoutedEventArgs e)
-        {
+        private void left_Click(object sender, RoutedEventArgs e) =>
             camera.Target = new Vector3(
                 camera.Target.X + 0.1f,
                 camera.Target.Y,
                 camera.Target.Z);
-        }
 
-        private void right_Click(object sender, RoutedEventArgs e)
-        {
+        private void right_Click(object sender, RoutedEventArgs e) =>
             camera.Target = new Vector3(
                 camera.Target.X - 0.1f,
                 camera.Target.Y,
                 camera.Target.Z);
-        }
 
-        private void up_Click(object sender, RoutedEventArgs e)
-        {
+        private void up_Click(object sender, RoutedEventArgs e) =>
             camera.Target = new Vector3(
                 camera.Target.X,
                 camera.Target.Y + 0.1f,
                 camera.Target.Z);
-        }
 
-        private void down_Click(object sender, RoutedEventArgs e)
-        {
+        private void down_Click(object sender, RoutedEventArgs e) =>
             camera.Target = new Vector3(
                 camera.Target.X,
                 camera.Target.Y - 0.1f,
                 camera.Target.Z);
-        }
 
         private void Window_KeyDown(object sender, KeyEventArgs e)
         {
@@ -116,28 +109,41 @@ namespace Demo
             }
         }
         
-        private void HorizontalPos_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
+        private void HorizontalPos_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) =>
             camera.Position = new Vector3(
                 camera.Position.X + (float)(e.NewValue - e.OldValue),
                 camera.Position.Y,
                 camera.Position.Z);
-        }
-        private void VerticalPos_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
+        
+        private void VerticalPos_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) =>
             camera.Position = new Vector3(
                 camera.Position.X,
                 camera.Position.Y + (float)(e.NewValue - e.OldValue),
                 camera.Position.Z);
-        }
 
-        private void DepthPos_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
+        private void DepthPos_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) =>
             camera.Position = new Vector3(
                 camera.Position.X,
                 camera.Position.Y,
                 camera.Position.Z + (float)(e.NewValue - e.OldValue));
-        }
+
+        private void LightHorizontalPos_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) =>
+            light.Position = new Vector3(
+                light.Position.X + (float)(e.NewValue - e.OldValue),
+                light.Position.Y,
+                light.Position.Z);
+
+        private void LightVerticalPos_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) =>
+            light.Position = new Vector3(
+                light.Position.X,
+                light.Position.Y + (float)(e.NewValue - e.OldValue),
+                light.Position.Z);
+
+        private void LightDepthPos_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) =>
+            light.Position = new Vector3(
+                light.Position.X,
+                light.Position.Y,
+                light.Position.Z + (float)(e.NewValue - e.OldValue));
 
         #endregion
     }

@@ -18,12 +18,12 @@ namespace Graphics3D
         private readonly Int32Rect bmpRect;
 
         private readonly Camera camera;
-        private readonly Vector3 lightPosition;
+        private readonly Light light;
         
-        public Device(Camera camera, Vector3 lightPosition, WriteableBitmap bmp)
+        public Device(Camera camera, Light light, WriteableBitmap bmp)
         {
             this.camera = camera;
-            this.lightPosition = lightPosition;
+            this.light = light;
 
             this.bmp = bmp;
             width = bmp.PixelWidth;
@@ -168,9 +168,9 @@ namespace Graphics3D
             Vector3 p3 = v3.Coordinates2D;
 
             var data = new ScanLineData();
-            float NdotLight1 = MathEx.CalcCosineAlpha(v1.WorldCoordinates, v1.WorldNormal, lightPosition);
-            float NdotLight2 = MathEx.CalcCosineAlpha(v2.WorldCoordinates, v2.WorldNormal, lightPosition);
-            float NdotLight3 = MathEx.CalcCosineAlpha(v3.WorldCoordinates, v3.WorldNormal, lightPosition);
+            float NdotLight1 = MathEx.CalcCosineAlpha(v1.WorldCoordinates, v1.WorldNormal, light.Position);
+            float NdotLight2 = MathEx.CalcCosineAlpha(v2.WorldCoordinates, v2.WorldNormal, light.Position);
+            float NdotLight3 = MathEx.CalcCosineAlpha(v3.WorldCoordinates, v3.WorldNormal, light.Position);
 
             float invSlope1 = 0, invSlope2 = 0;
             if (p2.Y - p1.Y > 0)

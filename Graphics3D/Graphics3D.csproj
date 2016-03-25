@@ -53,6 +53,7 @@
   <ItemGroup>
     <Compile Include="Camera.cs" />
     <Compile Include="ArrayExtensions.cs" />
+    <Compile Include="Light.cs" />
     <Compile Include="Device.cs" />
     <Compile Include="Face.cs" />
     <Compile Include="MathEx.cs" />
