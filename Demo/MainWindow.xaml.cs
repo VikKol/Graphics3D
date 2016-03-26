@@ -31,7 +31,9 @@ namespace Demo
             camera.Target = Vector3.Zero;
             camera.Position = new Vector3((float)HorizontalPos.Value, (float)VerticalPos.Value, (float)DepthPos.Value);
             light.Position = new Vector3((float)LightHorizontalPos.Value, (float)LightVerticalPos.Value, (float)LightDepthPos.Value);
-            device = new Device(camera, light, bmp, new VisualizerFactory<TextureVisualizer>());
+            device = new Device(camera, light, bmp, 
+                new VisualizerFactory<TextureVisualizer>());
+                //new VisualizerFactory<WireframeVisualizer>());
 
             meshes = MeshHelper.LoadFromJsonFile("Meshes/monkey.babylon");
             //meshes = MeshHelper.LoadFromJsonFile("Meshes/car.babylon");
