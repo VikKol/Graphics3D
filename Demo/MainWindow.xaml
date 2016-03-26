@@ -13,11 +13,11 @@
         <GroupBox x:Name="groupBox" Header="Camera" HorizontalAlignment="Left" Margin="652,10,0,0" VerticalAlignment="Top" Height="260" Width="163">
             <StackPanel Margin="0,5,0,0">
                 <Label Content="Vertical Position"/>
-                <Slider x:Name="VerticalPos" Width="146" Height="19" Value="25" Maximum="100" ValueChanged="VerticalPos_ValueChanged" Minimum="-100"/>
+                <Slider x:Name="VerticalPos" Width="146" Height="19" Maximum="100" ValueChanged="VerticalPos_ValueChanged" Minimum="-100"/>
                 <Label Content="Horizontal Position" />
                 <Slider x:Name="HorizontalPos" Width="146" Height="19" Maximum="100" Minimum="-100" ValueChanged="HorizontalPos_ValueChanged"/>
                 <Label Content="Depth" />
-                <Slider x:Name="DepthPos" Width="146" Height="19" Maximum="100" Value="100" ValueChanged="DepthPos_ValueChanged" Minimum="5"/>
+                <Slider x:Name="DepthPos" Width="146" Height="19" Maximum="100" Value="15" ValueChanged="DepthPos_ValueChanged" Minimum="5"/>
                 
                 <Button x:Name="button" Content="Up" Width="35" Margin="0,10,0,0" Click="up_Click"/>
                 <StackPanel Orientation="Horizontal" Margin="35,5,0,5">
@@ -34,7 +34,7 @@
                 <Label Content="Horizontal Position" />
                 <Slider x:Name="LightHorizontalPos" Width="146" Height="19" Maximum="100" Minimum="-100" ValueChanged="LightHorizontalPos_ValueChanged"/>
                 <Label Content="Depth" />
-                <Slider x:Name="LightDepthPos" Width="146" Height="19" Minimum="5" Maximum="100" Value="85" ValueChanged="LightDepthPos_ValueChanged" />
+                <Slider x:Name="LightDepthPos" Width="146" Height="19" Minimum="5" Maximum="100" Value="10" ValueChanged="LightDepthPos_ValueChanged" />
             </StackPanel>
         </GroupBox>
         <Label Name="fps" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="0,0,5,0" />

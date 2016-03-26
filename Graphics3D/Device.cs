@@ -88,7 +88,7 @@ namespace Graphics3D
                     var pixelB = ProjectTo2D(vertexB, transformMatrix, worldMatrix);
                     var pixelC = ProjectTo2D(vertexC, transformMatrix, worldMatrix);
 
-                    FillTriangle(pixelA, pixelB, pixelC, Color.Black);
+                    FillTriangle(pixelA, pixelB, pixelC, Color.Black, mesh.Texture);
                 });
             }
         }
@@ -110,7 +110,7 @@ namespace Graphics3D
             return vertex;
         }
 
-        private void ProcessScanLine(ScanLineData data, Vertex v11, Vertex v12, Vertex v21, Vertex v22, Color color)
+        private void ProcessScanLine(ScanLineData data, Vertex v11, Vertex v12, Vertex v21, Vertex v22, Color color, Texture texture)
         {
             int currY = data.CurrentY;
             Vector3 p11 = v11.Coordinates2D;
@@ -122,6 +122,7 @@ namespace Graphics3D
             var leftGradient = p11.Y == p12.Y ? 1 : (currY - p11.Y) / (p12.Y - p11.Y);
             var rightGradient = p21.Y == p22.Y ? 1 : (currY - p21.Y) / (p22.Y - p21.Y);
 
+            // Interpolating on Y
             int leftX = (int)MathEx.Interpolate(p11.X, p12.X, leftGradient);
             int rightX = (int)MathEx.Interpolate(p21.X, p22.X, rightGradient);
 
@@ -131,17 +132,30 @@ namespace Graphics3D
             float leftNdotLight = MathEx.Interpolate(data.NdotLightV11, data.NdotLightV12, leftGradient);
             float rightNdotLight = MathEx.Interpolate(data.NdotLightV21, data.NdotLightV22, rightGradient);
 
+            var leftU = MathEx.Interpolate(data.TextureU11, data.TextureU12, leftGradient);
+            var rightU = MathEx.Interpolate(data.TextureU21, data.TextureU22, rightGradient);
+            var leftV = MathEx.Interpolate(data.TextureV11, data.TextureV12, leftGradient);
+            var rightV = MathEx.Interpolate(data.TextureV21, data.TextureV22, rightGradient);
+
             for (var currX = leftX; currX < rightX; currX++)
             {
+                // Interpolating on X
                 float gradient = (currX - leftX) / (float)(rightX - leftX);
                 var currZ = MathEx.Interpolate(leftZ, rightZ, gradient);
                 var currNdotLight = MathEx.Interpolate(leftNdotLight, rightNdotLight, gradient);
+                var currU = MathEx.Interpolate(leftU, rightU, gradient);
+                var currV = MathEx.Interpolate(leftV, rightV, gradient);
 
-                DrawPoint(currX, currY, currZ, color * currNdotLight);
+                Color textureColor = texture == null ? color : texture.Map(currU, currV);
+                byte alpha = textureColor.A;
+                textureColor *= currNdotLight;
+                textureColor.A = alpha;
+
+                DrawPoint(currX, currY, currZ, textureColor);
             }
         }
 
-        private void FillTriangle(Vertex v1, Vertex v2, Vertex v3, Color color)
+        private void FillTriangle(Vertex v1, Vertex v2, Vertex v3, Color color, Texture texture)
         {
             // Sort by Y
             if (v1.Coordinates2D.Y > v2.Coordinates2D.Y)
@@ -195,20 +209,42 @@ namespace Graphics3D
                 data.NdotLightV12 = NdotLight3;
                 data.NdotLightV21 = NdotLight1;
                 data.NdotLightV22 = NdotLight2;
+
+                data.TextureU11 = v1.TextureCoordinates.X;
+                data.TextureU12 = v3.TextureCoordinates.X;
+                data.TextureU21 = v1.TextureCoordinates.X;
+                data.TextureU22 = v2.TextureCoordinates.X;
+
+                data.TextureV11 = v1.TextureCoordinates.Y;
+                data.TextureV12 = v3.TextureCoordinates.Y;
+                data.TextureV21 = v1.TextureCoordinates.Y;
+                data.TextureV22 = v2.TextureCoordinates.Y;
+
                 for (int currY = (int)p1.Y; currY < (int)p2.Y; currY++)
                 {
                     data.CurrentY = currY;
-                    ProcessScanLine(data, v1, v3, v1, v2, color);
+                    ProcessScanLine(data, v1, v3, v1, v2, color, texture);
                 }
 
                 data.NdotLightV11 = NdotLight1;
                 data.NdotLightV12 = NdotLight3;
                 data.NdotLightV21 = NdotLight2;
                 data.NdotLightV22 = NdotLight3;
+
+                data.TextureU11 = v1.TextureCoordinates.X;
+                data.TextureU12 = v3.TextureCoordinates.X;
+                data.TextureU21 = v2.TextureCoordinates.X;
+                data.TextureU22 = v3.TextureCoordinates.X;
+
+                data.TextureV11 = v1.TextureCoordinates.Y;
+                data.TextureV12 = v3.TextureCoordinates.Y;
+                data.TextureV21 = v2.TextureCoordinates.Y;
+                data.TextureV22 = v3.TextureCoordinates.Y;
+
                 for (int currY = (int)p2.Y; currY <= (int)p3.Y; currY++)
                 {
                     data.CurrentY = currY;
-                    ProcessScanLine(data, v1, v3, v2, v3, color);
+                    ProcessScanLine(data, v1, v3, v2, v3, color, texture);
                 }
             }
             // Triangle is:
@@ -228,20 +264,42 @@ namespace Graphics3D
                 data.NdotLightV12 = NdotLight2;
                 data.NdotLightV21 = NdotLight1;
                 data.NdotLightV22 = NdotLight3;
+
+                data.TextureU11 = v1.TextureCoordinates.X;
+                data.TextureU12 = v2.TextureCoordinates.X;
+                data.TextureU21 = v1.TextureCoordinates.X;
+                data.TextureU22 = v3.TextureCoordinates.X;
+
+                data.TextureV11 = v1.TextureCoordinates.Y;
+                data.TextureV12 = v2.TextureCoordinates.Y;
+                data.TextureV21 = v1.TextureCoordinates.Y;
+                data.TextureV22 = v3.TextureCoordinates.Y;
+
                 for (int currY = (int)p1.Y; currY <= (int)p2.Y; currY++)
                 {
                     data.CurrentY = currY;
-                    ProcessScanLine(data, v1, v2, v1, v3, color);
+                    ProcessScanLine(data, v1, v2, v1, v3, color, texture);
                 }
 
                 data.NdotLightV11 = NdotLight2;
                 data.NdotLightV12 = NdotLight3;
                 data.NdotLightV21 = NdotLight1;
                 data.NdotLightV22 = NdotLight3;
+
+                data.TextureU11 = v2.TextureCoordinates.X;
+                data.TextureU12 = v3.TextureCoordinates.X;
+                data.TextureU21 = v1.TextureCoordinates.X;
+                data.TextureU22 = v3.TextureCoordinates.X;
+
+                data.TextureV11 = v2.TextureCoordinates.Y;
+                data.TextureV12 = v3.TextureCoordinates.Y;
+                data.TextureV21 = v1.TextureCoordinates.Y;
+                data.TextureV22 = v3.TextureCoordinates.Y;
+
                 for (int currY = (int)p2.Y; currY <= (int)p3.Y; currY++)
                 {
                     data.CurrentY = currY;
-                    ProcessScanLine(data, v2, v3, v1, v3, color);
+                    ProcessScanLine(data, v2, v3, v1, v3, color, texture);
                 }
             }
         }

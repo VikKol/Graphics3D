@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Input;
 using SharpDX;
 using Graphics3D;
@@ -13,8 +12,6 @@ namespace Demo
     /// </summary>
     public partial class MainWindow : Window
     {
-        const double DPI = 96.0;
-
         private Device device;
         private Mesh[] meshes;
         private readonly Light light = new Light();
@@ -28,18 +25,16 @@ namespace Demo
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            var bmp = new WriteableBitmap(
-                (int)ImgContainer.ActualWidth, (int)ImgContainer.ActualHeight,
-                DPI, DPI, PixelFormats.Pbgra32, null);
-
+            var bmp = BitmapFactory.Create((int)ImgContainer.ActualWidth, (int)ImgContainer.ActualHeight);
             Img.Source = bmp;
+
             camera.Target = Vector3.Zero;
             camera.Position = new Vector3((float)HorizontalPos.Value, (float)VerticalPos.Value, (float)DepthPos.Value);
             light.Position = new Vector3((float)LightHorizontalPos.Value, (float)LightVerticalPos.Value, (float)LightDepthPos.Value);
             device = new Device(camera, light, bmp);
 
-            //meshes = MeshHelper.LoadFromJsonFile("Meshes/monkey.babylon");
-            meshes = MeshHelper.LoadFromJsonFile("Meshes/car.babylon");
+            meshes = MeshHelper.LoadFromJsonFile("Meshes/monkey.babylon");
+            //meshes = MeshHelper.LoadFromJsonFile("Meshes/car.babylon");
 
             CompositionTarget.Rendering += CompositionTarget_Rendering;
         }
@@ -129,7 +124,7 @@ namespace Demo
 
         private void LightHorizontalPos_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) =>
             light.Position = new Vector3(
-                light.Position.X + (float)(e.NewValue - e.OldValue),
+                light.Position.X - (float)(e.NewValue - e.OldValue),
                 light.Position.Y,
                 light.Position.Z);
 
@@ -143,7 +138,7 @@ namespace Demo
             light.Position = new Vector3(
                 light.Position.X,
                 light.Position.Y,
-                light.Position.Z + (float)(e.NewValue - e.OldValue));
+                light.Position.Z - (float)(e.NewValue - e.OldValue));
 
         #endregion
     }

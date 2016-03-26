@@ -11,16 +11,27 @@ namespace Graphics3D
         public static Mesh[] LoadFromJsonFile(string fileName)
         {
             var meshes = new List<Mesh>();
+            var materials = new Dictionary<string, Material>();
             var data = File.ReadAllText(fileName);
             dynamic jsonObject = JsonConvert.DeserializeObject(data);
+
+            for (var materialIndex = 0; materialIndex < jsonObject.materials.Count; materialIndex++)
+            {
+                var material = new Material();
+                material.ID = jsonObject.materials[materialIndex].id.Value;
+                material.Name = jsonObject.materials[materialIndex].name.Value;
+                if (jsonObject.materials[materialIndex].diffuseTexture != null)
+                    material.DiffuseTextureName = jsonObject.materials[materialIndex].diffuseTexture.name.Value;
+                materials.Add(material.ID, material);
+            }
 
             for (var meshIndex = 0; meshIndex < jsonObject.meshes.Count; meshIndex++)
             {
                 var verticesArray = jsonObject.meshes[meshIndex].vertices;
                 var facesArray = jsonObject.meshes[meshIndex].indices;
+                var uvCount = jsonObject.meshes[meshIndex].uvCount.Value;
 
                 var verticesStep = 1;
-                var uvCount = jsonObject.meshes[meshIndex].uvCount.Value;
 
                 // Depending of the number of texture's coordinates per vertex
                 // we're jumping in the vertices array by 6, 8 & 10 windows frame
@@ -59,6 +70,14 @@ namespace Graphics3D
                         Coordinates = new Vector3(x, y, z),
                         Normal = new Vector3(nx, ny, nz)
                     };
+
+                    if (uvCount > 0)
+                    {
+                        // Loading the texture coordinates
+                        float u = (float)verticesArray[index * verticesStep + 6].Value;
+                        float v = (float)verticesArray[index * verticesStep + 7].Value;
+                        mesh.Vertices[index].TextureCoordinates = new Vector2(u, v);
+                    }
                 }
 
                 // Filling the Faces array
@@ -73,6 +92,18 @@ namespace Graphics3D
                 // Getting the position set in Blender
                 var position = jsonObject.meshes[meshIndex].position;
                 mesh.Position = new Vector3((float)position[0].Value, (float)position[1].Value, (float)position[2].Value);
+
+                if (uvCount > 0)
+                {
+                    // Loading the texture
+                    var meshTextureID = jsonObject.meshes[meshIndex].materialId.Value;
+                    var meshTextureName = materials[meshTextureID].DiffuseTextureName;
+                    string path = fileName.Substring(0, fileName.LastIndexOf("/") + 1) + meshTextureName;
+                    mesh.Texture = new Texture(path);
+                }
+
+                mesh.ComputeFacesNormals();
+
                 meshes.Add(mesh);
             }
 
