@@ -1,6 +1,6 @@
 ﻿namespace Graphics3D
 {
-    public struct ScanLineData
+    internal struct ShaderData
     {
         public int CurrentY;
         public float NdotLightV11;

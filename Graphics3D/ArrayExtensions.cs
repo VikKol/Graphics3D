@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace Graphics3D
 {
-    public static unsafe class ArrayExtensions
+    static unsafe class ArrayExtensions
     {
         [StructLayout(LayoutKind.Explicit)]
         private struct ArrayUnion
