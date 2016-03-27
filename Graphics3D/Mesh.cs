@@ -10,9 +10,10 @@ namespace Graphics3D
         public Face[] Faces { get; private set; }
 
         public Texture Texture { get; set; }
+        public Color Color { get; set; } = Color.Black;
 
-        public Vector3 Position { get; set; }
-        public Vector3 Rotation { get; set; }
+        public Vector3 Position { get; set; } = Vector3.Zero;
+        public Vector3 Rotation { get; set; } = Vector3.Zero;
 
         public Mesh(string name, int verticesCount, int facesCount)
         {

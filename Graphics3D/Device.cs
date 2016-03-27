@@ -101,7 +101,7 @@ namespace Graphics3D
                     var pixelB = Project(vertexB, transformMatrix, worldMatrix);
                     var pixelC = Project(vertexC, transformMatrix, worldMatrix);
 
-                    visualizer.RenderTriangle(pixelA, pixelB, pixelC, Color.Black, mesh.Texture);
+                    visualizer.RenderTriangle(pixelA, pixelB, pixelC, mesh.Color, mesh.Texture);
                 });
             }
         }

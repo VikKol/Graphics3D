@@ -3,7 +3,7 @@ using SharpDX;
 
 namespace Graphics3D
 {
-    internal class Drawing
+    public class Drawing
     {
         private readonly int width;
         private readonly int height;
@@ -16,14 +16,14 @@ namespace Graphics3D
             this.height = height;
         }
 
-        private void DrawLine(Vector3 point0, Vector3 point1, Color color)
+        public void DrawLine(Vector3 point0, Vector3 point1, Color color)
         {
             if ((point1 - point0).Length() < 2)
                 return;
 
             var middle = point0 + ((point1 - point0) / 2);
 
-            PutPixel((int)middle.X, (int)middle.Y, color);
+            DrawPoint((int)middle.X, (int)middle.Y, color);
             DrawLine(point0, middle, color);
             DrawLine(middle, point1, color);
         }
@@ -38,7 +38,7 @@ namespace Graphics3D
 
             while (true)
             {
-                PutPixel(x0, y0, color);
+                DrawPoint(x0, y0, color);
 
                 if ((x0 == x1) && (y0 == y1)) break;
                 var e2 = 2 * err;
@@ -47,7 +47,7 @@ namespace Graphics3D
             }
         }
 
-        public void PutPixel(int x, int y, Color color)
+        public void DrawPoint(int x, int y, Color color)
         {
             if (x >= 0 && y >= 0 && x < width && y < height)
             {
