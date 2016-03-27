@@ -40,6 +40,11 @@ namespace Graphics3D
             visualizer = visualizerFactory.Create(width, height, backBuffer, depthBuffer, light);
         }
 
+        public void Clear(Color color)
+        {
+            Clear(color.R, color.G, color.B, color.A);
+        }
+
         public void Clear(byte r, byte g, byte b, byte a)
         {
             for (var index = 0; index < backBuffer.Length; index += 4)

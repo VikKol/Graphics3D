@@ -99,7 +99,10 @@ namespace Graphics3D
                     var meshTextureID = jsonObject.meshes[meshIndex].materialId.Value;
                     var meshTextureName = materials[meshTextureID].DiffuseTextureName;
                     string path = fileName.Substring(0, fileName.LastIndexOf("/") + 1) + meshTextureName;
-                    mesh.Texture = new Texture(path);
+                    if (File.Exists(path))
+                    {
+                        mesh.Texture = new Texture(path);
+                    }
                 }
 
                 mesh.ComputeFacesNormals();
