@@ -72,9 +72,9 @@ namespace Graphics3D
             float invslope1 = (v3.X - v1.X) / (v3.Y - v1.Y);
             float invslope2 = (v3.X - v2.X) / (v3.Y - v2.Y);
 
-            for (var y = (int)v3.Y; y >= (int)v1.Y; y--)
+            for (var y = v3.Y; y >= v2.Y; y--)
             {
-                drawing.DrawBline((int)curx1, y, (int)curx2, y, color);
+                drawing.DrawBline((int)curx1, (int)y, (int)curx2, (int)y, color);
                 curx1 -= invslope1;
                 curx2 -= invslope2;
             }
@@ -87,9 +87,9 @@ namespace Graphics3D
             float invslope1 = (v2.X - v1.X) / (v2.Y - v1.Y);
             float invslope2 = (v3.X - v1.X) / (v3.Y - v1.Y);
 
-            for (var y = (int)v1.Y; y <= (int)v2.Y; y++)
+            for (var y = v1.Y; y <= v2.Y; y++)
             {
-                drawing.DrawBline((int)curx1, y, (int)curx2, y, color);
+                drawing.DrawBline((int)curx1, (int)y, (int)curx2, (int)y, color);
                 curx1 += invslope1;
                 curx2 += invslope2;
             }

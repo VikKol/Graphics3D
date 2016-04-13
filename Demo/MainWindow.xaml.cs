@@ -34,6 +34,7 @@ namespace Demo
             device = new Device(camera, light, bmp, 
                 new VisualizerFactory<TextureVisualizer>());
                 //new VisualizerFactory<WireframeVisualizer>());
+                //new VisualizerFactory<TriangleRasterizationVisualizer>());
 
             meshes = MeshHelper.LoadFromJsonFile("Meshes/monkey.babylon");
             //meshes = MeshHelper.LoadFromJsonFile("Meshes/car.babylon");
