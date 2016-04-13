@@ -14,7 +14,7 @@ namespace Demo
     {
         private Device device;
         private Mesh[] meshes;
-        private readonly Light light = new Light();
+        private readonly Light light = new DirectLight();
         private readonly Graphics3D.Camera camera = new Graphics3D.Camera();
         private static DateTime previousDate = DateTime.Now;
 

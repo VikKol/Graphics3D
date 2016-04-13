@@ -53,9 +53,9 @@ namespace Graphics3D
             Vector3 p3 = v3.Coordinates2D;
 
             var data = new ShaderData();
-            float NdotLight1 = MathEx.CalcCosineAlpha(v1.WorldCoordinates, v1.WorldNormal, light.Position);
-            float NdotLight2 = MathEx.CalcCosineAlpha(v2.WorldCoordinates, v2.WorldNormal, light.Position);
-            float NdotLight3 = MathEx.CalcCosineAlpha(v3.WorldCoordinates, v3.WorldNormal, light.Position);
+            float NdotLight1 = light.CalcLightFraction(v1.WorldCoordinates, v1.WorldNormal);
+            float NdotLight2 = light.CalcLightFraction(v2.WorldCoordinates, v2.WorldNormal);
+            float NdotLight3 = light.CalcLightFraction(v3.WorldCoordinates, v3.WorldNormal);
 
             float invSlope1 = 0, invSlope2 = 0;
             if (p2.Y - p1.Y > 0)
@@ -222,14 +222,11 @@ namespace Graphics3D
 
         private static Color CalcColor(Color color, float lightFraction, Texture texture, float u, float v)
         {
-            if (texture == null)
-                return color * lightFraction;
-
-            Color textureColor = texture.Map(u, v);
-            byte alpha = textureColor.A;
-            textureColor *= lightFraction;
-            textureColor.A = alpha;
-            return textureColor;
+            Color resultColor = texture == null ? color : texture.Map(u, v);
+            byte alpha = resultColor.A;
+            resultColor *= lightFraction;
+            resultColor.A = alpha;
+            return resultColor;
         }
     }
 }

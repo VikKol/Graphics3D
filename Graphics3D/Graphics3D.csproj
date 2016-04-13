@@ -52,9 +52,11 @@
     <Reference Include="PresentationCore" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AmbientLight.cs" />
     <Compile Include="BitmapFactory.cs" />
     <Compile Include="Camera.cs" />
     <Compile Include="ArrayExtensions.cs" />
+    <Compile Include="DirectLight.cs" />
     <Compile Include="Drawing.cs" />
     <Compile Include="IVisualizerFactory.cs" />
     <Compile Include="IVisualizer.cs" />

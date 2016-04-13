@@ -1,7 +1,4 @@
-﻿using System;
-using SharpDX;
-
-namespace Graphics3D
+﻿namespace Graphics3D
 {
     public static class MathEx
     {
@@ -22,16 +19,6 @@ namespace Graphics3D
             return min2 + (
                     (value - min1) * (
                         (max2 - min2) / (max1 - min1)));
-        }
-
-        public static float CalcCosineAlpha(Vector3 vertex, Vector3 normal, Vector3 lightPosition)
-        {
-            var lightDirection = lightPosition - vertex;
-
-            normal.Normalize();
-            lightDirection.Normalize();
-
-            return Math.Max(0, Vector3.Dot(normal, lightDirection));
-        }
+        }        
     }
 }
