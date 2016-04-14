@@ -5,18 +5,18 @@ namespace Graphics3D
 {
     public class Drawing
     {
-        private readonly int width;
-        private readonly int height;
-        private readonly byte[] pixelBuffer;
+        protected readonly int Width;
+        protected readonly int Height;
+        protected readonly byte[] PixelBuffer;
 
         public Drawing(byte[] bgraArray, int width, int height)
         {
-            this.pixelBuffer = bgraArray;
-            this.width = width;
-            this.height = height;
+            this.PixelBuffer = bgraArray;
+            this.Width = width;
+            this.Height = height;
         }
 
-        public void DrawLine(Vector3 point0, Vector3 point1, Color color)
+        public void DrawLine(Vector2 point0, Vector2 point1, Color color)
         {
             if ((point1 - point0).Length() < 2)
                 return;
@@ -49,13 +49,24 @@ namespace Graphics3D
 
         public void DrawPoint(int x, int y, Color color)
         {
-            if (x >= 0 && y >= 0 && x < width && y < height)
+            if (x >= 0 && y >= 0 && x < Width && y < Height)
             {
-                var index4 = (x + (y * width)) * 4;
-                pixelBuffer[index4] = color.B;
-                pixelBuffer[index4 + 1] = color.G;
-                pixelBuffer[index4 + 2] = color.R;
-                pixelBuffer[index4 + 3] = color.A;
+                var index4 = (x + (y * Width)) * 4;
+                PixelBuffer[index4] = color.B;
+                PixelBuffer[index4 + 1] = color.G;
+                PixelBuffer[index4 + 2] = color.R;
+                PixelBuffer[index4 + 3] = color.A;
+            }
+        }
+
+        public void Clear(Color color)
+        {
+            for (var index = 0; index < PixelBuffer.Length; index += 4)
+            {
+                PixelBuffer[index] = color.B;
+                PixelBuffer[index + 1] = color.G;
+                PixelBuffer[index + 2] = color.R;
+                PixelBuffer[index + 3] = color.A;
             }
         }
     }
